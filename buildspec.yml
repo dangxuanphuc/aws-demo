@@ -12,6 +12,7 @@ phases:
       nodejs: 14
     commands:
       - echo "$EC2_PRIVATE_KEY" > ec2-key.pem
+      - sed -i 's/\\n/\\n/g' ec2-key.pem
       - chmod 600 ec2-key.pem
 
   build:
