@@ -27,6 +27,7 @@ phases:
       - echo "Deploying to EC2 via SSH..."
       - |
         ssh -o StrictHostKeyChecking=no -i ec2-key.pem $EC2_USER@$EC2_HOST "
+          sudo systemctl stop nginx || true &&
           mkdir -p $DEPLOY_DIR &&
           rm -rf $DEPLOY_DIR/* &&
           unzip -o /home/$EC2_USER/artifact.zip -d $DEPLOY_DIR &&
