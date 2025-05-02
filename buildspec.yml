@@ -14,7 +14,6 @@ phases:
       nodejs: 14
     commands:
       - echo "$EC2_PRIVATE_KEY" > ec2-key.pem
-      - sed -i 's/\\n/\\n/g' ec2-key.pem
       - chmod 600 ec2-key.pem
 
   build:
@@ -26,14 +25,13 @@ phases:
     commands:
       - echo "Deploying to EC2 via SSH..."
       - |
+        scp -o StrictHostKeyChecking=no -i ec2-key.pem artifact.zip $EC2_USER@$EC2_HOST:/home/$EC2_USER/
         ssh -o StrictHostKeyChecking=no -i ec2-key.pem $EC2_USER@$EC2_HOST "
           sudo systemctl stop nginx || true &&
           mkdir -p $DEPLOY_DIR &&
-          rm -rf $DEPLOY_DIR/* &&
           unzip -o /home/$EC2_USER/artifact.zip -d $DEPLOY_DIR &&
           cd $DEPLOY_DIR &&
           npm install &&
-          sudo fuser -k 80/tcp || true &&
           nohup node app.js > out.log 2>&1 &
         "
 
