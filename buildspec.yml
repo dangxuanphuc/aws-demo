@@ -28,11 +28,13 @@ phases:
         scp -o StrictHostKeyChecking=no -i ec2-key.pem artifact.zip $EC2_USER@$EC2_HOST:/home/$EC2_USER/
         ssh -o StrictHostKeyChecking=no -i ec2-key.pem $EC2_USER@$EC2_HOST "
           sudo systemctl stop nginx || true &&
-          mkdir -p $DEPLOY_DIR &&
+          rm -rf $DEPLOY_DIR &&
           unzip -o /home/$EC2_USER/artifact.zip -d $DEPLOY_DIR &&
           cd $DEPLOY_DIR &&
           npm install &&
-          nohup node app.js > out.log 2>&1 &
+          sudo fuser -k 80/tcp || true &&
+          sudo nohup node app.js > out.log 2>&1 &
+          exit
         "
 
 artifacts:
