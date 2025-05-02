@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     EC2_USER: ec2-user
-    EC2_HOST: 13.208.164.189
+    EC2_HOST: 13.208.175.233
     DEPLOY_DIR: /home/ec2-user/app
   secrets-manager:
     EC2_PRIVATE_KEY: codebuild/ssh/ec2-private-key
