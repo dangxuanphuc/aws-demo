@@ -1,0 +1,38 @@
+version: 0.2
+
+env:
+  variables:
+    EC2_USER: ec2-user
+    EC2_HOST: 13.208.181.194
+    DEPLOY_DIR: /home/ec2-user/app
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 14
+    commands:
+      - echo "$EC2_PRIVATE_KEY" > ec2-key.pem
+      - chmod 600 ec2-key.pem
+
+  build:
+    commands:
+      - npm install
+      - zip -r artifact.zip .
+
+  post_build:
+    commands:
+      - echo "Deploying to EC2 via SSH..."
+      - |
+        ssh -o StrictHostKeyChecking=no -i ec2-key.pem $EC2_USER@$EC2_HOST "
+          mkdir -p $DEPLOY_DIR &&
+          rm -rf $DEPLOY_DIR/* &&
+          unzip -o /home/$EC2_USER/artifact.zip -d $DEPLOY_DIR &&
+          cd $DEPLOY_DIR &&
+          npm install &&
+          sudo fuser -k 80/tcp || true &&
+          sudo nohup node app.js > out.log 2>&1 &
+        "
+
+artifacts:
+  files:
+    - artifact.zip
