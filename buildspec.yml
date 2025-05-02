@@ -34,7 +34,7 @@ phases:
           cd $DEPLOY_DIR &&
           npm install &&
           sudo fuser -k 80/tcp || true &&
-          sudo nohup node app.js > out.log 2>&1 &
+          nohup node app.js > out.log 2>&1 &
         "
 
 artifacts:
